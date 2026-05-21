@@ -1145,14 +1145,6 @@ function collectAndSubmit(pfx) {
     }).catch(function(err){
       console.error('전송 오류:', err);
     });
-    const btn=document.querySelector('#sec-'+pfx+' .sub-btn');
-    if(btn){btn.disabled=true;btn.textContent='처리 중...';}
-    setTimeout(()=>{
-      const sec=g('sec-'+pfx);if(sec)sec.classList.add('sec-locked');
-      const tabs=g('tabs');if(tabs)tabs.classList.add('tabs-locked');
-      if(document.activeElement)document.activeElement.blur();
-      showOkPage(pfx);
-    },700);
   }
 
   if (files.length === 0) {
