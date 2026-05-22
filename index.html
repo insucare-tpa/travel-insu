@@ -356,7 +356,7 @@ input.inp-err,input.field-err-input{border-color:var(--err)!important;background
 @media(min-width:720px){.tabs{flex-direction:row}}
 
 /* 접수완료 페이지 */
-.ok-page{display:none;position:fixed;inset:0;z-index:10001;overflow-y:auto;background:#F0F2F5}
+.ok-page{display:none;position:fixed;inset:0;z-index:10003;overflow-y:auto;background:#F0F2F5}
 .ok-page.on{display:block}
 .ok-page-inner{max-width:480px;width:100%;margin:0 auto;padding:2rem 1.5rem;min-height:100vh;display:flex;flex-direction:column;justify-content:center}
 .ok-page-ic{width:100px;height:100px;background:linear-gradient(135deg,#34D399,#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 28px;box-shadow:0 20px 48px rgba(5,150,105,.22)}
@@ -1056,7 +1056,26 @@ input.inp-err,input.field-err-input{border-color:var(--err)!important;background
     <div class="rn-note">이 점 양해 부탁드립니다.</div></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+// xlsx 라이브러리 동적 로드 (여러 CDN 폴백)
+(function() {
+  var cdns = [
+    'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js',
+    'https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
+  ];
+  var idx = 0;
+  function load() {
+    if (idx >= cdns.length) return;
+    var s = document.createElement('script');
+    s.src = cdns[idx];
+    s.crossOrigin = 'anonymous';
+    s.onerror = function() { idx++; load(); };
+    document.head.appendChild(s);
+  }
+  load();
+})();
+</script>
 <script>
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxB5f6qvIR0RvdedoPeIC8T5xvNKawXZ2b--tN-tj4cSqwtHtB2WwYlr47dGvN_atjyMA/exec'; // 배포 후 URL로 교체
 
@@ -2814,9 +2833,12 @@ function showConfirmModal(mode,fn){
 function closeModal(){g('confirm-modal').classList.remove('on');pendingFn=null;}
 function doSubmit(){
   g('confirm-modal').classList.remove('on');
-  if(pendingFn) pendingFn();
-  // 구글시트 전송
-  if(currentSubmitPfx) collectAndSubmit(currentSubmitPfx);
+  const _fn=pendingFn;pendingFn=null;
+  const _pfx=currentSubmitPfx;
+  setTimeout(function(){
+    if(_fn) _fn();
+    if(_pfx) collectAndSubmit(_pfx);
+  },50);
 }
 
 /* ── 엑셀 업로드 ── */
